@@ -1,5 +1,6 @@
-import { TodoItem } from "./todoItem";
-import { TodoCollection } from "./todoCollection";
+import { TodoItem } from "./todoItem.js";
+import { TodoCollection } from "./todoCollection.js";
+import inquirer from "inquirer";
 
 let todos = [
     new TodoItem(1, "Buy flowers"), new TodoItem(2, "Get Shoes"),
@@ -8,11 +9,29 @@ let todos = [
 
 let collection = new TodoCollection("Adam", todos);
 console.clear();
-console.log(`${ collection.userName}'s Todo List` + `(${collection.getItemCounts().incomplete} items to do)`);
 
-// let newId = collection.addTodo("Go for fun");
-// let todoItem = collection.getTodoById(newId);
+function displayTodoList() {
+    console.log(`${ collection.userName}'s Todo List` + `(${collection.getItemCounts().incomplete} items to do)`);
+    collection.getTodoItems(true).forEach(item => item.printDetails());
+}
 
-// todoItem.printDetails();
-// collection.removeComplete();
-collection.getTodoItems(true).forEach(item => item.printDetails());
+enum Commands {
+    Quit = "Quit"
+}
+
+function promptUser():void {
+    console.clear();
+    displayTodoList();
+    inquirer.prompt({
+        type:"list",
+        name: "command",
+        message: "Choose option",
+        choices: Object.values(Commands)
+    }).then(answers => {
+        if(answers['command'] !== Commands.Quit) {
+            promptUser();
+        }
+    })
+}
+
+promptUser();
